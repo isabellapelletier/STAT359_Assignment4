@@ -1,0 +1,330 @@
+---
+title: "STAT 359 - Assignment 4"
+author: "Isabella Pelletier"
+date: "11/24/2020"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1. 
+#
+__Read the data into R, and use table() function to produce a contingency table summarizing these data.__
+```{r}
+cancer = read.table(file="~/Desktop/R/LungCancer.csv", header = TRUE, sep=",")
+```
+```{r}
+cancer.table = as.matrix(table(cancer))
+cancer.table
+```
+
+* The null hypothesis states that there is no association between smoking and lung cancer. 
+* The alternative hypothesis states that there is an association between smoking and lung cancer. 
+
+#
+__Assuming that there is no association between smoking and lung cancer, compute a table of 'expected' counts.__
+```{r}
+chisq.test(cancer.table,correct=FALSE)$expected
+```
+
+#
+__By hand, compute the observed value of the test statistic for testing association between lung cancer and smoking.__
+
+* To find the observed value of the test statistic under independence, we need to use this equation:
+                                            
+                                      χ2 = ∑(Oij - Eij)/Eij
+                                            
+* χ2 = (60-41.02889)^2/41.02889 + (650-668.9711)^2/668.9711 + (22-40.97111)^2/40.97111 + (687-668.0289)^2/668.0289
+* χ2 = 18.63
+
+#
+__Assuming there is no association, what is the distribution of the test statistic?__
+
+* To determine if the statistic is 'large' we need to know the null distribution.
+* If the null hypothesis is true, then this statistic has degrees of freedom of (r-1)(c-1), which in our case is (2-1)(2-1). This gives us a value of 1. 
+* So we compare to a χ<sup>2</sup><sub>1</sub> distribution. (chi-square with superscript 2, and subscript 1)
+
+#
+__Using R, compute the p-value for a test of association, and give a detailed conclusion based on the p-value and a comparison of the tables observed and expected counts.__
+```{r}
+chisq.test(cancer.table, correct=FALSE)
+```
+
+* We obtained a p-value of 1.585e-05 which provides very strong evidence against the null hypothesis. Thus we reject the null hypothesis of  independence and conclude that there is an association between smoking and lung cancer. 
+* For those who smoke, the number of observed individuals with lung cancer (687) was greater than that expected under independence (668.0289). The observed number of individuals without lung cancer (650) was less than that expected under independence (668.9711).
+* For those who do not smoke, the observed number of individuals with lung cancer (22) was less than that expected under independence (40.97111). The observed number of individuals without lung cancer (60) was greater than that expected under independence (41.02889).
+
+#
+# Question 2. 
+#
+__Assuming that there is no association between disease and blood group, compute a table of 'expected' counts.__
+```{r}
+eskimo = matrix(c(7,27,55,7,34,52,7,12,11,13,18,24),nrow=3,ncol=4,dimnames=list(c("Moderately-advanced","Minimal","Not Present"),c("O","A","AB","B")))
+eskimo
+```
+```{r}
+chisq.test(eskimo,correct=FALSE)$expected
+```
+
+* The null hypothesis states that there is no association between tuberculosis and blood group.
+* The alternative hypothesis states that there is an association between tuberculosis and blood group. 
+
+#
+__By hand, compute the observed value of the test statistic for testing association between disease and blood group.__
+
+* To find the observed value of the test statistic under independence, we need to use this equation:
+                                            
+                                     χ2 = ∑(Oij - Eij)/Eij
+                                            
+* χ2 = (7-11.33)^2/11.33 + (7-11.8427)^2/11.8427 + (7-3.820225)^2/3.820225 + (13-7.003745)^2/7.003745 + (27-30.33)^2/30.33 + (34-31.69663)^2/31.69663 + (12-10.224719)^2/10.224719 + (18-18.745318)^2/18.745318 + (55-47.33)^2/47.33 + (52-49.46067)^2/49.46067 + (11-15.955056)^2/15.955056 + (24-29.250936)^2/29.250936
+* χ2 = 16.145
+
+#
+__Assuming there is no association, what is the distribution of the test statistic?__
+
+* If the null hypothesis is true, then this statistic has degrees of freedom of (r-1)(c-1), which in our case is (3-1)(4-1). This gives us a value of 6. 
+* So we compare to a χ<sup>2</sup><sub>6</sub> distribution. (chi-square with superscript 2, and subscript 6)
+
+#
+__Using R, compute the p-value for a test of association, and give a detailed conclusion based on the p-value and a comparison of the tables observed and expected counts.__
+```{r}
+chisq.test(eskimo, correct=FALSE)
+```
+
+* We obtained a p-value of 0.01301 which provides minimal evidence against the null hypothesis. Thus we reject the null hypothesis of  independence and conclude that there is an association between tuberculosis and blood group. 
+* For those with blood type O, the number of observed individuals with Moderate-advanced tuberculosis (7) was less than that expected under independence (11.33333). The observed number of individuals with minimal tuberculosis (27) was less than that expected under independence (30.33333). The observed number of individuals with no presence of tuberculosis (55) was greater than expected under independence (47.33333).
+* For those with blood type A, the number of observed individuals with Moderate-advanced tuberculosis (7) was less than that expected under independence (11.84270). The observed number of individuals with minimal tuberculosis (34) was greater than that expected under independence (31.69663). The observed number of individuals with no presence of tuberculosis (52) was greater than expected under independence (49.46067).
+* For those with blood type AB, the number of observed individuals with Moderate-advanced tuberculosis (7) was greater than that expected under independence (3.820225). The observed number of individuals with minimal tuberculosis (12) was greater than that expected under independence (10.224719). The observed number of individuals with no presence of tuberculosis (11) was less than expected under independence (15.955056).
+* For those with blood type B, the number of observed individuals with Moderate-advanced tuberculosis (13) was greater than that expected under independence (7.003745). The observed number of individuals with minimal tuberculosis (18) was relatively the same of that expected under independence (18.745318). The observed number of individuals with no presence of tuberculosis (24) was less than expected under independence (29.250936).
+
+#
+# Question 3. 
+#
+__(a) Produce 4 scatter plots (one for each data set), on the same page, illustrating the relationship between Y and X. Describe each of these briefly, and state if you think a linear model of the form yi = a + bxi + εi (simple linear regression) would be appropriate.__
+```{r}
+set1x<-c(10,8,13,9,11,14,6,4,12,7,5)
+set1y<-c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
+dataset1 = cbind(set1x,set1y)
+```
+```{r}
+set2x<-c(10,8,13,9,11,14,6,4,12,7,5)
+set2y<-c(9.14,8.14,8.74,8.77,9.26,8.1,6.13,3.1,9.13,7.26,4.74)
+dataset2 = cbind(set2x,set2y)
+```
+```{r}
+set3x<-c(10,8,13,9,11,14,6,4,12,7,5)
+set3y<-c(7.46,6.77,12.74,7.11,7.81,8.84,6.08,5.39,8.15,6.42,5.73)
+dataset3 = cbind(set3x,set3y)
+```
+```{r}
+set4x<-c(8,8,8,8,8,8,8,19,8,8,8)
+set4y<-c(6.58,5.76,7.71,8.84,8.47,7.04,5.25,12.5,5.56,7.91,6.89)
+dataset4 = cbind(set4x,set4y)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(dataset1, pch=16)
+title("Dataset 1")
+plot(dataset2, pch=16)
+title("Dataset 2")
+plot(dataset3, pch=16)
+title("Dataset 3")
+plot(dataset4, pch=16)
+title("Dataset 4")
+```
+
+* Dataset 1 has a weak linear relationship, and a positive association and correlation between X and Y. A linear regression model could be appropriate. 
+* Dataset 2 seems to be more quadratic than linear, but there is a positive correlation between X and Y. A simple linear regression model may fit but a non-linear model would be more appropriate. 
+* Dataset 3  has a stronger linear relationship, and a positive correlation between X and Y but there is an outlier at X=13. A non-linear model would be more appropriate than a linear one. 
+* Dataset 4 is not linear with no direction. There is an outlier at X=19. A non-linear model would be more appropriate than a linear one.  
+
+#
+__(b) Perform 4 separate simple linear regressions (one for each data set) and produce a table (in your text editor (ie. word)) that shows the R-squared value. Discuss what is happening here (hint: for simple linear regression, R-squared is just the square of the sample correlation coefficient).__
+```{r}
+plot(dataset1, main="Simple Linear Regression for Dataset 1", pch=16)
+abline(lm(set1y~set1x), col="red")
+```
+```{r}
+summary(lm(set1y~set1x))
+```
+
+* For Dataset 1 the R-squared value is 0.6665, which means that 66.65% of the variation in Y can be explained by X. The value is positive which demonstrates positive correlation between X and Y. 
+#
+```{r}
+plot(dataset2, main="Simple Linear Regression for Dataset 2", pch=16)
+abline(lm(set2y~set2x), col="red")
+```
+```{r}
+summary(lm(set2y~set2x))
+```
+
+* For Dataset 2 the R-squared value is 0.6662, which means that 66.62% of the variation in Y can be explained by X. The value is positive which demonstrates positive correlation between X and Y. 
+#
+```{r}
+plot(dataset3, main="Simple Linear Regression for Dataset 3", pch=16)
+abline(lm(set3y~set3x), col="red")
+```
+```{r}
+summary(lm(set3y~set3x))
+```
+
+* For Dataset 3 the R-squared value is 0.6663, which means that 66.63% of the variation in Y can be explained by X. The value is positive which demonstrates positive correlation between X and Y. 
+#
+```{r}
+plot(dataset4, main="Simple Linear Regression for Dataset 4", pch=16)
+abline(lm(set4y~set4x), col="red")
+```
+```{r}
+summary(lm(set4y~set4x))
+```
+
+* For Dataset 4 the R-squared value is 0.6667, which means that 66.67% of the variation in Y can be explained by X. The value is positive which demonstrates positive correlation between X and Y. 
+#
+```{r}
+table<- matrix(c(0.6665,0.6662,0.6663,0.6667),nrow=4,ncol=1,dimnames=list(c("Dataset 1", "Dataset 2", "Dataset 3", "Dataset 4"),("R-squared Value")))
+table
+```
+
+* It is apparent from the graphs and summaries that although the Datasets differ, they all have approximately the same linear regression line, fit of model, and a positive correlation.
+
+#
+# Question 4. 
+#
+__The file 'growth' gives data on the height of a white spruce tree measured annually for 50 years. Letting Yt denote the height of the tree at year t > 0, we consider describing the growth of the tree over time with a non-linear model Yt = f(t) + εt, εt ~ N(0,sigma-squared. Three growth curves are considered for f(t).__
+  __(a) Logistic: f(t) = a/(1+b*exp{-ct})__
+  __(b) Gompertz: f(t) = aexp{-bexp{-ct}}__
+  __(c) Von Bertalanffy: f(t) = a-aexp{-b(t+c)}__
+
+```{r}
+growth = read.table(file="~/Desktop/R/growth.txt", header=TRUE, sep="")
+attach(growth)
+names(growth)
+```
+
+#
+__Fit all three models using the non-linear least squares function nls() in R. Explain how you are choosing the starting values for nls() in each case. Produce a figure depicting the estimated curves all on the same plot, along with the observed data. Be sure to include a legend to distinguish the different curves.__
+```{r}
+plot(t,height)
+title("Height of white spruce by year")
+```
+
+#
+* For all three models we will have to calculate and select the starting values and evaluate f(t) at t=0, and t=∞.
+* The hypothese test for all three models are generally the same. H0a: a=0, H0b: b=0, H0c: c=0 and H1a: a≠0, H1b: b≠0, H1c: c≠0
+
+#
+```{r}
+library(nls2)
+# For model 1 at t=0, f(t) = a/(1+b)
+# at t=∞, f(t) = a
+# we know that a is the asymptote so from the horizontal asymptote on the plot a = 52
+# at 0.02 there is a y-intercept which gives us 0.02 = 52/(1+b), solving for b gives us b = 259
+# now, solving for c at the steepest part of the plot y=22 and t=19, so c=(-1/19)*ln((52/(259*22))-(1/259))=0.276
+a1 = 52
+b1 = 259
+c1 = 0.276
+model1 = nls(height~(a1/(1+b1*exp(-c1*t))), start = list(a1=52,b1=259,c1=0.276))
+summary(model1)
+```
+* The p-values for all of a1, b1, and c1 are all less then 0.05 and thus are significant. All null hypotheses can be rejected for model 1.
+
+
+```{r}
+# For model 2 at t=0, f(t) = a*exp(-b)
+# at t=∞, f(t) = a
+# we know that a is the asymptote so from the horizontal asymptote on the plot a = 52
+# at 0.02 there is a y-intercept which gives us 0.02 = 52*exp(-b), solving for b gives us b = 7.86
+# now, solving for c at the steepest part of the plot y=22 and t=19, so c=(-1/19)*(ln((-1/7.86)*ln(22/52))=0.116
+a2=52
+b2=7.86
+c2=0.116
+model2 = nls(height~(a2*exp(-b2*exp(-c2*t))), start=list(a2=52, b2=7.86, c2=0.116))
+summary(model2)
+```
+* The p-values for all of a2, b2, and c2 are all less then 0.05 and thus are significant. All null hypotheses can be rejected for model 2.
+
+```{r}
+# For model 3 at t=0, f(t) = a-a*exp(-b*c)
+# at t=∞, f(t) = a
+# we know that a is the asymptote so from the horizontal asymptote on the plot a = 52
+# at 0.02 there is a y-intercept which gives us 0.02 = 52-52*exp(-b*c)
+# there are two unknown values in this equation so we need another one.
+# using the steepest part of the plot we get c = ((-1/b)*ln(1-(22/52)))-19
+# then using b = (-1/(((-1/b)*ln(1-(22/52)))-19))*ln(1-(0.02/52)) subbing in our equation for c we get b = 0.0289
+# subbing our new b into the c expression we get c = 0.03275
+a3=52
+b3=0.0289
+c3=0.03275
+model3 = nls(height~(a3-a3*exp(-b3*(t+c3))), start=list(a3=52,b3=0.0289,c3=0.03275))
+summary(model3)
+```
+
+* The p-values for all of a3, b3, and c3 are all less then 0.05 and thus are significant. All null hypotheses can be rejected for model 3.
+
+```{r}
+plot(t,height, pch=16)
+t.fit = seq(0,50,0.1)
+model1.fit = predict(model1, list(t=t.fit))
+model2.fit = predict(model2, list(t=t.fit))
+model3.fit = predict(model3, list(t=t.fit))
+lines(t.fit,model1.fit, col="black", lty=2)
+lines(t.fit,model2.fit, col="red", lty=2)
+lines(t.fit,model3.fit, col="blue", lty=2)
+title("Height of White Spruce by Year")
+legend
+legend(x=0,y=60,legend=c("Model 1", "Model 2", "Model 3"), fill=c("black", "red", "blue"))
+```
+#
+* Models 1 and two seem to have the best fit.
+
+#
+__For each of the three models, give a 95% confidence interval for lim t->∞ f(t), What does this represent?__
+```{r}
+#1
+a.CI1 = c(50.4207-1.96*0.8473,50.4207+1.96*0.8473)
+a.CI1
+```
+
+```{r}
+#2
+a.CI2 = c(52.21786-1.96*1.33361,52.21786+1.96*1.33361)
+a.CI2
+```
+
+```{r}
+#3
+a.CI3 = c(74.411730-1.96*9.950840,74.411730+1.96*9.950840)
+a.CI3
+```
+
+* The confidence intervals for a1 and a2 overlap which means that they are similar in function. 
+
+#
+__Select the best of the three models, and plot an estimate of the derivative df(t)/dt, which represents the rate of growth over time.__
+```{r}
+# It seemed as though model 1 was the best fit of the three models. 
+plot(t,height, pch=16)
+t.fit = seq(0,50,0.1)
+model1.fit = predict(model1, list(t=t.fit))
+lines(t.fit,model1.fit, col="black", lty=2)
+title("Growth rate over time")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
